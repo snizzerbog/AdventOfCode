@@ -1,0 +1,63 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day9
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("coordinates.txt");
+
+            Console.WriteLine("PuzzleAnswer1: " + DayNinePartOne(fileText));
+            //Console.WriteLine("PuzzleAnswer2: " + DayNinePartTwo(fileText));
+        }
+
+        static long DayNinePartOne(string[] fileText) { 
+            List<List<BigInteger>> coords = new List<List<BigInteger>>();
+
+            foreach (string s in fileText)
+            {
+                List<string> coords_str = new List<string>();
+                List<BigInteger> coords_int = new List<BigInteger>();
+
+                coords_str = (s.Split(',').ToList());
+
+                foreach (string c in coords_str)
+                {
+                    coords_int.Add(BigInteger.Parse(c));
+                }
+
+                coords.Add(coords_int);
+            }
+
+
+            long highestArea = 0;
+            long calculatedArea = 0;
+            int highi = 0;
+            int highj = 0;
+            for (int i = 0; i < coords.Count; i++)
+            {
+                {
+                    for (int j = i; j < coords.Count; j++)
+                    {
+                        calculatedArea = (long)((long)Math.Abs((long)coords[i][0] - (long)coords[j][0]) + 1) * (long)(Math.Abs((long)coords[i][1] - (long)coords[j][1]) + 1);
+
+                        if (calculatedArea > highestArea)
+                        {
+                            highestArea = calculatedArea;
+                            highi = i;
+                            highj = j;
+                        }
+
+                    }
+                }
+            }
+
+           return highestArea;
+        }
+    }
+}
