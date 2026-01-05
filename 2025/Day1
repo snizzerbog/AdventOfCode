@@ -1,0 +1,132 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+
+namespace AoC1
+{
+    class Program
+    {
+    static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("levels.txt");
+            List<int> values = new List<int>();
+            List<char> directions = new List<char>();
+
+            foreach (string row in fileText)
+            {
+                char direction = row[0];
+                int value = int.Parse(row.Substring(1));
+                values.Add(value);
+                directions.Add(direction);
+            }
+
+
+            Console.WriteLine("Password1: " + DayOnePartOne(values, directions, 50));
+
+            Console.WriteLine("Password2: " + DayOnePartTwo(values, directions, 50));
+
+        }
+
+        static int DayOnePartOne(List<int>  values, List<char> directions, int currentVal)
+        {
+            int zeroCount = 0;
+
+            for (int i = 0; i < directions.Count; i++)
+            {
+                if (directions[i] == 'R')
+                {
+                    currentVal += values[i];
+                    while (currentVal > 99)
+                    {
+                        currentVal -= 100;
+                    }
+                }
+                else
+                {
+                    currentVal -= values[i];
+                    
+                    while (currentVal <= 0)
+                    {
+                        currentVal += 100;
+                    }
+                }
+
+                if (currentVal == 0)
+                {
+                    zeroCount += 1;
+                }
+
+            }
+
+            return zeroCount;
+        }
+
+        static int DayOnePartTwo(List<int> values, List<char> directions, int currentVal)
+        {
+            int zeroCount = 0;
+            for (int i = 0; i < directions.Count; i++)
+            {
+                if (directions[i] == 'R')
+                {
+                    currentVal += values[i];
+                    while (currentVal > 99)
+                    {
+                        currentVal -= 100;
+                        zeroCount += 1;
+                    }
+                }
+                else
+                {
+                    if (currentVal > 0 && (currentVal - values[i]) < 0)
+                    {
+                        currentVal -= values[i];
+
+
+                        while (currentVal < 0)
+                        {
+                            currentVal += 100;
+                            zeroCount += 1;
+                            if (currentVal == 0)
+                            {
+                                zeroCount += 1;
+                            }
+                        }
+                    }
+                    else if (currentVal == 0)
+                    {
+                        currentVal -= values[i];
+                        if (values[i] > 0)
+                        {
+                            zeroCount -= 1;
+                        }
+
+                        while (currentVal < 0)
+                        {
+                            currentVal += 100;
+                            zeroCount += 1;
+                            if (currentVal == 0)
+                            {
+                                zeroCount += 1;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        currentVal -= values[i];
+                        if (currentVal == 0)
+                        {
+                            zeroCount += 1;
+                        }
+                    }
+
+
+                }
+
+
+            }
+
+            return zeroCount;
+        }
+    }
+}
