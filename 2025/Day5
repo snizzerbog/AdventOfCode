@@ -1,0 +1,210 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day5
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Read codes as a 2d array where each item in the array is an start and end
+            var fileText = File.ReadAllLines("codes.txt");
+            List<List<BigInteger>> endpoints = new List<List<BigInteger>>();
+            bool lists = true;
+            List<BigInteger> items = new List<BigInteger>();
+
+            foreach (string c in fileText)
+            {
+                if (lists == true)
+                {
+                    if (c == "")
+                    {
+                        lists = false;
+                    }
+                    else
+                    {
+                        List<string> values_str = c.Split('-').ToList();
+                        List<BigInteger> values = new List<BigInteger>();
+                        foreach (string s in values_str)
+                        {
+                            values.Add(BigInteger.Parse(s));
+                        }
+                        endpoints.Add(values);
+                    }
+                }
+                else
+                {
+                    BigInteger value = BigInteger.Parse(c);
+                    items.Add(value);
+                }
+            }
+
+            Console.WriteLine("PuzzleAnswer1: " + DayFivePartOne(items, endpoints));
+            Console.WriteLine("PuzzleAnswer2: " + DayFivePartTwo(endpoints));
+
+        }
+
+        static int DayFivePartOne(List<BigInteger> items, List<List<BigInteger>> endpoints)
+        {
+            int count = 0;
+            bool countAdd = false;
+
+            foreach (BigInteger item in items)
+            {
+                countAdd = false;
+                for (int i = 0; i < endpoints.Count; i++)
+                {
+                    if (item >= endpoints[i][0] && item <= endpoints[i][1])
+                    {
+                        countAdd = true;
+                    }
+
+                }
+
+                if (countAdd)
+                {
+                    //Console.WriteLine("added");
+                    count += 1;
+                }
+            }
+
+            return count;
+        }
+
+        static BigInteger DayFivePartTwo(List<List<BigInteger>> endpoints)
+        {
+            BigInteger count = 0;
+            List<List<BigInteger>> endpoints2 = new List<List<BigInteger>>();
+            bool change = true;
+
+            while (change)
+            {
+                change = false;
+                endpoints2.Add(endpoints[0]);
+
+                for (int i = 1; i < endpoints.Count; i++)
+                {
+                    BigInteger start = endpoints[i][0];
+                    BigInteger end = endpoints[i][1];
+                    bool added = true;
+                    bool donAdd = false;
+                    while (added && (donAdd == false))
+                    {
+                        added = false;
+                        for (int j = 0; j < endpoints2.Count; j++)
+                        {
+                            BigInteger st2 = endpoints2[j][0];
+                            BigInteger ed2 = endpoints2[j][1];
+
+                            if (start == st2 && end == ed2)
+                            {
+                                added = false;
+                                donAdd = true;
+                                continue;
+                            }
+                            else if (start == st2 && end > ed2)
+                            {
+                                // Update the end
+                                added = true;
+                                change = true;
+                                endpoints2[j][1] = end;
+                                endpoints[i][1] = end;
+                            }
+                            else if (start < st2 && end == ed2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][0] = start;
+                                endpoints[i][0] = start;
+                            }
+                            else if (start < st2 && end > ed2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][0] = start;
+                                endpoints2[j][1] = end;
+                                endpoints[i][0] = start;
+                                endpoints[i][1] = end;
+                            }
+                            else if (start < st2 && end < ed2 && end > st2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][0] = start;
+                                endpoints[i][0] = start;
+                            }
+                            else if (start > st2 && end > ed2 && start < ed2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][1] = end;
+                                endpoints[i][1] = end;
+                            }
+                            else if (start == ed2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][1] = end;
+                                endpoints[i][0] = st2;
+                            }
+                            else if (end == st2)
+                            {
+                                added = true;
+                                change = true;
+                                endpoints2[j][0] = start;
+                                endpoints[i][1] = ed2;
+                            }
+                            else if (start > st2 && end == ed2)
+                            {
+                                added = false;
+                                donAdd = true;
+                                continue;
+                            }
+                            else if (start == st2 && end < ed2)
+                            {
+                                added = false;
+                                donAdd = true;
+                                continue;
+                            }
+                            else if (start > st2 && end < ed2)
+                            {
+                                added = false;
+                                donAdd = true;
+                                continue;
+                            }
+                            else
+                            {
+                                added = false;
+                            }
+                        }
+                    }
+
+                    if (added == false && donAdd == false)
+                    {
+                        endpoints2.Add(endpoints[i]);
+                    }
+                    else if (donAdd)
+                    {
+                        endpoints.RemoveAt(i);
+                        i -= 1;
+                    }
+
+                }
+
+                endpoints = endpoints2;
+                endpoints2 = new List<List<BigInteger>>();
+            }
+
+
+            for (int i = 0; i < endpoints.Count; i++)
+            {
+                count += (endpoints[i][1] - endpoints[i][0]) + 1;
+            }
+
+            return count;
+        }
+    }
+}
