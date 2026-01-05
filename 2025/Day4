@@ -1,0 +1,225 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day_4
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("floor.txt");
+            List<Char[]> rows = new List<Char[]>();
+
+            foreach (string row in fileText)
+            {
+                rows.Add(row.ToCharArray());
+            }
+
+            Console.WriteLine("PuzzleAnswer1: " + DayFourPartOne(rows));
+            Console.WriteLine("PuzzleAnswer2: " + DayFourPartTwo(rows));
+        }
+
+        static int DayFourPartOne(List<Char[]> rows)
+        {
+            int count = 0;
+
+            for (int i = 0; i < rows.Count; i++)
+                {
+                    for (int j = 0; j < rows[i].Length; j++)
+                    {
+                        // if present then check
+                        if (rows[i][j] == '@')
+                        {
+                            int num = 0;
+                            if (i > 0 && j > 0)
+                            {
+                                if (rows[i - 1][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i > 0)
+                            {
+                                if (rows[i - 1][j] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i > 0 && j < (rows[i].Length - 1))
+                            {
+                                if (rows[i - 1][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (j > 0)
+                            {
+                                if (rows[i][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (j < (rows[i].Length - 1))
+                            {
+                                if (rows[i][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1) && j > 0)
+                            {
+                                if (rows[i + 1][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1))
+                            {
+                                if (rows[i + 1][j] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1) && j < (rows[i].Length - 1))
+                            {
+                                if (rows[i + 1][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (num < 4)
+                            {
+                                count += 1;
+                            }
+
+                        }
+                    
+                }
+            }
+
+            return count;
+        }
+
+        static int DayFourPartTwo(List<Char[]> rows)
+        {
+            int count = 0;
+            bool removed = true;
+
+            while (removed)
+            {
+                removed = false;
+                for (int i = 0; i < rows.Count; i++)
+                {
+                    for (int j = 0; j < rows[i].Length; j++)
+                    {
+                        // if present then check
+                        if (rows[i][j] == '@')
+                        {
+                            int num = 0;
+                            if (i > 0 && j > 0)
+                            {
+                                if (rows[i - 1][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i > 0)
+                            {
+                                if (rows[i - 1][j] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i > 0 && j < (rows[i].Length - 1))
+                            {
+                                if (rows[i - 1][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (j > 0)
+                            {
+                                if (rows[i][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (j < (rows[i].Length - 1))
+                            {
+                                if (rows[i][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1) && j > 0)
+                            {
+                                if (rows[i + 1][j - 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1))
+                            {
+                                if (rows[i + 1][j] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (i < (rows.Count - 1) && j < (rows[i].Length - 1))
+                            {
+                                if (rows[i + 1][j + 1] == '@')
+                                {
+                                    num += 1;
+                                }
+
+                            }
+
+                            if (num < 4)
+                            {
+                                count += 1;
+                                rows[i][j] = 'x';
+                                removed = true;
+                            }
+
+                        }
+                    }
+                }
+            }
+
+            return count;
+        }
+    }
+}
