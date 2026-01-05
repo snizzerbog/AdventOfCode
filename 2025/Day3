@@ -1,0 +1,100 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day3
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            // Read codes as a 2d array where each item in the array is an start and end
+            var fileText = File.ReadAllLines("batteries.txt");
+
+            Console.WriteLine("PuzzleAnswer1: " + DayThreePartOne(fileText));
+            Console.WriteLine("PuzzleAnswer2: " + DayThreePartTwo(fileText));
+        }
+
+        static (string, int) getBiggestPossible(int limit, string str)
+        {
+            int max = 0;
+            string rt = "";
+            foreach (Char c in str) {
+                int num = (c - '0');
+                if (num > max)
+                {
+                    string num_str = num.ToString();
+                    string rt_temp = str.Substring((str.IndexOf(num_str[0]) + 1));
+                    if (rt_temp.Length >= limit)
+                    {
+                        max = num;
+                        rt = rt_temp;
+                    }
+                }
+            }
+
+            return (rt, max);
+
+        }
+
+        static double DayThreePartOne(string[] fileText)
+        {
+            // Read codes as a 2d array where each item in the array is an start and end
+            List<List<Char>> batts = new List<List<Char>>();
+            double count = 0;
+
+            
+            foreach (string row in fileText)
+            {
+                List<Char> values = new List<Char>();
+                foreach (Char r in row)
+                {
+                    values.Add(r);
+                }
+                batts.Add(values);
+            }
+
+            
+            for (int i = 0; i < batts.Count; i++)
+            {
+                int max = 0;
+                for (int j = 0; j < batts[i].Count; j++) {
+                    for (int k = (j + 1); k < batts[i].Count; k++)
+                    {
+                        int num = ((batts[i][j]- '0') * 10) + (batts[i][k]-'0');
+                        if (num > max)
+                        {
+                            max = num;
+                        }
+                    } 
+                }
+                count += max;
+            }
+
+            return count;
+
+        }
+
+        static double DayThreePartTwo(string[] fileText)
+        {
+            double count = 0;
+
+            int add = 0;
+
+            //get each substring for 12 digits
+            foreach (string row in fileText)
+            {
+                string starting = row;
+                for (int i = 11; i >= 0; i--)
+                {
+                    (starting, add) = getBiggestPossible(i, starting);
+                    count += add * (Math.Pow(10, i));
+                }
+            }
+
+            return count;
+        }
+    }
+}
