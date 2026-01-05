@@ -1,0 +1,315 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day8
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("coordinates.txt");
+            List<List<int>> coords = new List<List<int>>();
+            List<List<double>> distances = new List<List<double>>();
+
+            foreach (string s in fileText)
+            {
+                List<string> l_str = s.Split(',').ToList();
+                List<int> ls = new List<int>();
+
+
+                foreach (string l in l_str)
+                {
+                    ls.Add(int.Parse(l));
+                }
+                coords.Add(ls);
+            }
+
+            for (int f = 0; f < coords.Count; f++)
+            {
+                List<double> dist = new List<double>();
+                for (int s = 0; s < coords.Count; s++)
+                {
+                    if (f == s)
+                    {
+                        dist.Add(-1);
+                    }
+                    else
+                    {
+                        dist.Add(calculateStraightDistance(coords[f], coords[s]));
+                    }
+                }
+                distances.Add(dist);
+            }
+
+            Console.WriteLine("Currently part 1 is not efficient so will run for about a minute");
+            Console.WriteLine("PuzzleAnswer1: " + DayEightPartOne(coords, distances));
+            Console.WriteLine("Currently part 2 is not efficient so will run for a long time");
+            Console.WriteLine("PuzzleAnswer2: " + DayEightPartTwo(coords, distances));
+
+        }
+
+        static double calculateStraightDistance(List<int> fst, List<int> snd)
+        {
+            return Math.Sqrt(Math.Pow((fst[0] - snd[0]), 2) + Math.Pow((fst[1] - snd[1]), 2) + Math.Pow((fst[2] - snd[2]), 2));
+        }
+
+        static (int, int) getShortestDistance(List<List<double>> dists)
+        {
+            double shortest = (dists[0][1] * -1);
+            int from = 0;
+            int to = 0;
+
+            for (int f = 0; f < dists.Count; f++)
+            {
+                for (int s = f; s < dists[f].Count; s++)
+                {
+                    if (dists[f][s] == -1)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        if ((dists[f][s] * -1) > shortest)
+                        {
+                            shortest = (dists[f][s] * -1);
+                            from = f;
+                            to = s;
+                        }
+                    }
+                }
+            }
+
+
+
+            return (from, to);
+        }
+
+        static int DayEightPartOne(List<List<int>> coords, List<List<double>> distances)
+        {
+            List<List<int>> circuits = new List<List<int>>();
+
+            for (int i = 0; i < 1000; i++)
+            {
+                int from = 0;
+                int to = 0;
+                int fromCirc = -1;
+                int toCirc = -1;
+                (from, to) = getShortestDistance(distances);
+
+                if (from == 0 && to == 0)
+                {
+                    break;
+                }
+
+                //update this distance with -1
+                distances[from][to] = -1;
+                distances[to][from] = -1;
+
+                //continue here with adding indexes to connections if one is in a circuit or creating a new if not
+                // do this by searvhing connections and see if you spot any if both then dont add if one then add the other
+
+                for (int s = 0; s < circuits.Count; s++)
+                {
+                    for (int r = 0; r < circuits[s].Count; r++)
+                    {
+                        if (circuits[s][r] == from || circuits[s][r] == from)
+                        {
+                            fromCirc = s;
+                        }
+                        else if (circuits[s][r] == to || circuits[s][r] == to)
+                        {
+                            toCirc = s;
+
+                        }
+
+                        if (fromCirc > -1 && toCirc > -1)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (fromCirc > -1 && toCirc > -1)
+                    {
+                        break;
+                    }
+                }
+
+
+                List<int> c = new List<int>();
+                if (fromCirc == -1 && toCirc == -1)
+                {
+                    List<List<int>> cs = new List<List<int>>();
+                    c.Add(from);
+                    c.Add(to);
+                    circuits.Add(c);
+                }
+                else if (fromCirc == -1)
+                {
+                    circuits[toCirc].Add(from);
+                }
+                else if (toCirc == -1)
+                {
+                    circuits[fromCirc].Add(to);
+                }
+                else if (fromCirc == toCirc)
+                {
+                    continue;
+                }
+                else
+                {
+                    // this is the annoying one need to connect circuits
+                    foreach (int d in circuits[toCirc])
+                    {
+                        circuits[fromCirc].Add(d);
+                    }
+                    circuits.RemoveAt(toCirc);
+                }
+
+
+            }
+
+            List<int> counts = new List<int>();
+            foreach (List<int> circ in circuits)
+            {
+                counts.Add(circ.Count);
+            }
+
+            counts.Sort();
+            counts.Reverse();
+
+            int count = 1;
+
+            for (int x = 0; x < 3; x++)
+            {
+                count *= counts[x];
+            }
+
+            return count;
+        }
+
+        static int DayEightPartTwo(List<List<int>> coords, List<List<double>> distances)
+        {
+            List<List<List<int>>> circuits = new List<List<List<int>>>();
+
+            // Will maybe attempt to order the distances from the start and then dont need to recalculate the shortest each time
+
+            bool keepGoing = true;
+            int i = 0;
+            int Bigfrom = 0;
+            int Bigto = 0;
+
+            while (keepGoing)
+            {
+                if (i % 1000 == 0)
+                {
+                    // like 90k i think it was
+                    Console.WriteLine(i);
+                }
+                int from = 0;
+                int to = 0;
+                int fromCirc = -1;
+                int toCirc = -1;
+                (from, to) = getShortestDistance(distances);
+
+                if (from == 0 && to == 0)
+                {
+                    break;
+                }
+
+                //update this distance with -1
+                distances[from][to] = -1;
+                distances[to][from] = -1;
+
+                //continue here with adding indexes to connections if one is in a circuit or creating a new if not
+                // do this by searvhing connections and see if you spot any if both then dont add if one then add the other
+
+                for (int s = 0; s < circuits.Count; s++)
+                {
+                    for (int r = 0; r < circuits[s].Count; r++)
+                    {
+                        if (circuits[s][r][0] == from || circuits[s][r][1] == from)
+                        {
+                            fromCirc = s;
+                        }
+                        else if (circuits[s][r][0] == to || circuits[s][r][1] == to)
+                        {
+                            toCirc = s;
+
+                        }
+
+                        if (fromCirc > -1 && toCirc > -1)
+                        {
+                            break;
+                        }
+                    }
+
+                    if (fromCirc > -1 && toCirc > -1)
+                    {
+                        break;
+                    }
+                }
+
+                List<int> c = new List<int>();
+                if (fromCirc == -1 && toCirc == -1)
+                {
+                    List<List<int>> cs = new List<List<int>>();
+                    c.Add(from);
+                    c.Add(to);
+                    cs.Add(c);
+                    circuits.Add(cs);
+                    Bigfrom = from;
+                    Bigto = to;
+                }
+                else if (fromCirc == -1)
+                {
+                    c.Add(to);
+                    c.Add(from);
+                    circuits[toCirc].Add(c);
+                    Bigfrom = from;
+                    Bigto = to;
+                }
+                else if (toCirc == -1)
+                {
+                    c.Add(to);
+                    c.Add(from);
+                    circuits[fromCirc].Add(c);
+                    Bigfrom = from;
+                    Bigto = to;
+                }
+                else if (fromCirc == toCirc)
+                {
+                    i++;
+                    continue;
+                }
+                else
+                {
+                    // this is the annoying one need to connect circuits
+                    foreach (List<int> d in circuits[toCirc])
+                    {
+                        circuits[fromCirc].Add(d);
+                    }
+                    circuits.RemoveAt(toCirc);
+                    Bigfrom = from;
+                    Bigto = to;
+                }
+
+
+                if (circuits[0].Count == (coords.Count - 1))
+                {
+                    keepGoing = false;
+                }
+
+                i++;
+
+            }
+
+            int output = coords[Bigfrom][0] * coords[Bigto][0];
+            return output;
+        }
+    }
+}
+
+
