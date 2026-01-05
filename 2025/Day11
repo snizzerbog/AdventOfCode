@@ -1,0 +1,94 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day11
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("devices.txt");
+            List<string> devices = new List<string>();
+            List<List<string>> outputs = new List<List<string>>();
+            List<string> paths = new List<string>();
+            int count = 0;
+            paths.Add("you");
+
+            foreach (string s in fileText)
+            {
+                // first split on :
+                List<string> temp = s.Split(':').ToList();
+
+                devices.Add(temp[0]);
+
+                List<string> temp2 = temp[1].Split(' ').ToList();
+
+                List<string> temp3 = new List<string>();
+
+                foreach (string t in temp2)
+                {
+                    if (t.Trim() != "")
+                    {
+
+                    
+                    temp3.Add(t.Trim());
+                    }
+            }
+
+                outputs.Add(temp3);
+            }
+
+            Console.WriteLine("devices:");
+            foreach (string d in devices)
+            {
+                Console.WriteLine(d);
+            }
+
+            Console.WriteLine("outputs:");
+            foreach (List<string> os in outputs)
+            {
+                foreach (string o in os)
+                {
+                    Console.Write(o + " ");
+                    //Console.Write("0");
+                }
+                Console.WriteLine();
+            }
+
+            while (paths.Count > 0)
+            {
+
+                List<string> paths_temp = new List<string>();
+
+                foreach (string p in paths)
+                {
+                    //get index of p in devices
+                    int index = devices.IndexOf(p);
+
+                    //get outputs for that device
+                    List<string> currentOutputs = outputs[index];
+
+                    foreach (string o in currentOutputs)
+                    {
+                        if (o == "out")
+                        {
+                            count += 1;
+                        }
+                        else
+                        {
+                            paths_temp.Add(o);
+                        }
+                    }
+                }
+
+                paths = paths_temp;
+            }
+
+            Console.WriteLine("count: " + count);
+
+        }
+    }
+}
