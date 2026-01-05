@@ -1,0 +1,127 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day2
+{
+    class Program
+
+    {
+        static void Main(string[] args)
+        {
+            // Read codes as a 2d array where each item in the array is an start and end
+            var fileText = File.ReadAllLines("codes.txt");
+            List<List<BigInteger>> endpoints = new List<List<BigInteger>>();
+            List<string> codes = fileText[0].Split(',').ToList();
+
+            foreach (string c in codes){
+                List<BigInteger> values = c.Split('-').ToList().Select(x => BigInteger.Parse(x)).ToList();
+                endpoints.Add(values);
+            }
+
+            Console.WriteLine("PuzzleAnswer1: " + DayTwoPartOne(endpoints));
+            Console.WriteLine("PuzzleAnswer2: " + DayTwoPartTwo(endpoints));
+        }
+
+        static BigInteger DayTwoPartOne(List<List<BigInteger>> endpoints) {
+            BigInteger count = 0;
+
+            for (int i = 0; i < endpoints.Count; i++)
+            {
+                BigInteger start = endpoints[i][0];
+                BigInteger end = endpoints[i][1];
+                for (BigInteger j = start; j <= end; j++)
+                {
+                    //if number is even in lengh
+                    string j_string = j.ToString();
+                    if ((j_string.Length % 2) == 0)
+                    {
+                        string sub = j_string.Substring(j_string.Length / 2);
+                        sub += sub;
+
+                        if (sub == j_string)
+                        {
+                            count += j;
+                        }
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            return count;
+        }
+
+        static BigInteger DayTwoPartTwo(List<List<BigInteger>> endpoints) {
+            BigInteger count = 0;
+
+            for (int i = 0; i < endpoints.Count; i++)
+            {
+                BigInteger start = endpoints[i][0];
+                BigInteger end = endpoints[i][1];
+                for (BigInteger j = start; j <= end; j++)
+                {
+                    //if number is even in lengh
+                    string j_string = j.ToString();
+                    if ((j_string.Length % 2) == 0)
+                    {
+                        //Console.WriteLine("HERE1");
+                        for (int r = 1; r <= j_string.Length / 2; r++)
+                        {
+                            //Console.WriteLine("HERE2");
+                            //if j is dividable by r then
+                            if (j_string.Length % r == 0)
+                            {
+                                //Console.WriteLine("HERE3");
+                                int divid = j_string.Length / r;
+                                string sub = j_string.Substring(j_string.Length - r);
+                                string subs = "";
+                                for (int s = 0; s < divid; s++)
+                                {
+                                    subs += sub;
+                                }
+
+                                if (subs == j_string)
+                                {
+                                    count += j;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    else
+                    {
+                        for (int r = 1; r <= j_string.Length / 2; r++)
+                        {
+                            //if j is dividable by r then
+                            if (j_string.Length % r == 0)
+                            {
+                                int divid = j_string.Length / r;
+                                string sub = j_string.Substring(j_string.Length - r);
+                                string subs = "";
+                                for (int s = 0; s < divid; s++)
+                                {
+                                    subs += sub;
+                                }
+
+                                if (subs == j_string)
+                                {
+                                    count += j;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return count;
+
+        }
+
+    }
+}
