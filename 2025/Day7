@@ -1,0 +1,119 @@
+using System;
+using System.IO;
+using System.Linq;
+using System.Collections.Generic;
+using System.Numerics;
+
+namespace Day7
+{
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            var fileText = File.ReadAllLines("manifold.txt");
+
+            // might add a visulisation later
+
+            Console.WriteLine("PuzzleAnswer1: " + DaySevenPartOne(fileText));
+            Console.WriteLine("PuzzleAnswer2: " + DaySevenPartTwo(fileText));
+        }
+
+        static BigInteger DaySevenPartOne(string[] fileText)
+        {
+            List<int> index = new List<int>();
+            BigInteger count = 0;
+
+            string line1 = fileText[0];
+            for (int c = 0; c < line1.Length; c++)
+            {
+                if (line1[c] == 'S')
+                {
+                    index.Add(c);
+                }
+            }
+
+            foreach (string s in fileText)
+            {
+                // line can be used to print the updated manifold
+                List<Char> line = s.ToList();
+                List<int> newIndex = new List<int>();
+                // for each in timelines ned to do this and then add splits to timeline
+                for (int i = 0; i < index.Count; i++)
+                {
+                    int idx = index[i];
+                    if (s[idx] == '^')
+                    {
+                        newIndex.Add(idx + 1);
+                        newIndex.Add(idx - 1);
+                        line[idx + 1] = '|';
+                        line[idx - 1] = '|';
+                        count += 1;
+                    }
+                    else
+                    {
+                        newIndex.Add(idx);
+                        line[idx] = '|';
+                    }
+
+                }
+                index = newIndex.Distinct().ToList();
+            }
+
+            return count;
+        }
+
+        static BigInteger DaySevenPartTwo(string[] fileText)
+        {
+            List<int> index = new List<int>();
+            List<BigInteger> counts = new List<BigInteger>();
+            //List<List<Char>> lines = new List<List<char>>();
+
+            string line1 = fileText[0];
+            for (int c = 0; c < line1.Length; c++)
+            {
+                if (line1[c] == 'S')
+                {
+                    index.Add(c);
+                    counts.Add(1);
+                }
+                else
+                {
+                    counts.Add(0);
+                }
+            }
+
+            foreach (string s in fileText)
+            {
+                List<int> newIndex = new List<int>();
+                // for each in timelines ned to do this and then add splits to timeline
+                for (int i = 0; i < index.Count; i++)
+                {
+                    int idx = index[i];
+                    if (s[idx] == '^')
+                    {
+                        newIndex.Add(idx + 1);
+                        newIndex.Add(idx - 1);
+
+                        counts[idx + 1] += counts[idx];
+                        counts[idx - 1] += counts[idx];
+                        counts[idx] = new BigInteger(0);
+                    }
+                    else
+                    {
+                        newIndex.Add(idx);
+                    }
+
+                }
+                index = newIndex.Distinct().ToList();
+            }
+
+            BigInteger final = 0;
+            foreach (BigInteger c in counts)
+            {
+                final += c;
+            }
+
+            return final;
+        }
+    }
+}
